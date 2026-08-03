@@ -2,3 +2,5 @@
 .myenv
 12_ChatWithPDF/__pycache__
 docs
+13_ITSupportChatbot/__pycache__
+13_ITSupportChatbot/chroma_db
