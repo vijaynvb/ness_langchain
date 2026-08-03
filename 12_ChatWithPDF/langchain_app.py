@@ -5,9 +5,14 @@ from langchain_classic.chains import ConversationalRetrievalChain
 from langchain_classic.vectorstores import FAISS
 from langchain_classic.memory import ConversationBufferMemory
 from dotenv import load_dotenv
-from langchain_aws import ChatBedrock, BedrockEmbeddings   
+from langchain_aws import ChatBedrock, BedrockEmbeddings  
+import os 
 
 load_dotenv()
+
+os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID")
+os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY")
+os.environ["AWS_DEFAULT_REGION"] = os.getenv("AWS_DEFAULT_REGION")
 
 def load_pdf(file_paths):
     text = ""
@@ -46,7 +51,7 @@ def create_chat_chain(vectorstore):
     chat_model = ChatBedrock(model_id="mistral.mistral-7b-instruct-v0:2", temperature=0)
     retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k":3})
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    memory.chat_memory.add_user_message(System_Prompt)
+    memory.chat_memory.add_system_message(System_Prompt)
     qa_chain = ConversationalRetrievalChain.from_llm(
         chat_model,
         retriever,
