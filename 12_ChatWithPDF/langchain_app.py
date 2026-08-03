@@ -35,12 +35,18 @@ def create_vectorstore(chunks):
     vectorstore = FAISS.from_texts(chunks, embeddings)
     return vectorstore
 
+System_Prompt = """You are a helpful assistant that answers questions based on the provided context. in pdf. 
+If the context chunks in the PDF do not contain the answer,
+respond with "I don't know." Do not make up answers. 
+Provide concise and accurate responses based on the information available in the PDF."""
+
 # create chat model and retrieval chain 
 # temperature is set to 0 for deterministic responses
 def create_chat_chain(vectorstore):
     chat_model = ChatBedrock(model_id="mistral.mistral-7b-instruct-v0:2", temperature=0)
     retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k":3})
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    memory.chat_memory.add_user_message(System_Prompt)
     qa_chain = ConversationalRetrievalChain.from_llm(
         chat_model,
         retriever,
